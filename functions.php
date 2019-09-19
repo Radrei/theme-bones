@@ -1,7 +1,6 @@
 <?php
 /*
-Author: Eddie Machado
-URL: http://themble.com/bones/
+Author: Brittany Stafford
 
 This is where you can drop your custom functions or
 just edit things like thumbnail sizes, header images,
@@ -163,6 +162,15 @@ function bones_register_sidebars() {
 		'before_title' => '<h4 class="widgettitle">',
 		'after_title' => '</h4>',
 	));
+	register_sidebar(array(
+		'id' => 'analytics',
+		'name' => __( 'Analytics', 'bonestheme' ),
+		'description' => __( 'Widget to hold Analytics code', 'bonestheme' ),
+		'before_widget' => '',
+		'after_widget' => '',
+		'before_title' => '',
+		'after_title' => '',
+	));
 
 	/*
 	to add more sidebars or widgetized areas, just copy
@@ -189,6 +197,36 @@ function bones_register_sidebars() {
 
 	*/
 } // don't remove this bracket!
+
+/* Special widget with no surrounding div */
+add_action( 'widgets_init', 'register_my_widgets' );
+
+function register_my_widgets() {
+    register_widget( 'My_Analytics_Widget' );
+	register_sidebar(array(
+		'id' => 'analytics',
+		'name' => __( 'Analytics', 'bonestheme' ),
+		'description' => __( 'The analytics widget', 'bonestheme' ),
+		'before_widget' => '',
+		'after_widget' => '',
+		'before_title' => '',
+		'after_title' => '',
+	));
+	
+}
+class My_Analytics_Widget extends WP_Widget_Text {
+    function widget( $args, $instance ) {
+        extract($args);
+        $title = apply_filters( 'widget_title', empty( $instance['title'] ) ? '' : $instance['title'], $instance, $this->id_base );
+        $text = apply_filters( 'widget_text', empty( $instance['text'] ) ? '' : $instance['text'], $instance );
+        echo $before_widget;
+        if ( !empty( $title ) ) { echo $before_title . $title . $after_title; } ?>
+            <?php echo !empty( $instance['filter'] ) ? wpautop( $text ) : $text; ?>
+        <?php
+        echo $after_widget;
+    }	
+}
+/* End Special Widget */
 
 
 /************* COMMENT LAYOUT *********************/
@@ -231,17 +269,58 @@ function bones_comments( $comment, $args, $depth ) {
 } // don't remove this bracket!
 
 
-/*
-This is a modification of a function found in the
-twentythirteen theme where we can declare some
-external fonts. If you're using Google Fonts, you
-can replace these fonts, change it in your scss files
-and be up and running in seconds.
-*/
+/*------------------------------------*\
+	External Modules/Files
+\*------------------------------------*/
+// Uncomment as needed
+
+//Fonts
 function bones_fonts() {
-  wp_enqueue_style('googleFonts', '//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic');
+	// Google
+	wp_enqueue_style('googleFonts', 'http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic');
+	
+	/* Font Awesome
+	wp_enqueue_style( 'prefix-font-awesome', '//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', array(), '4.4.0' );
+	*/
 }
 
 add_action('wp_enqueue_scripts', 'bones_fonts');
+
+/* TypeKit Fonts 
+function theme_typekit() {
+    wp_enqueue_script( 'theme_typekit', '//use.typekit.net/bjl8euh.js');
+}
+add_action( 'wp_enqueue_scripts', 'theme_typekit' );
+
+function theme_typekit_inline() {
+  if ( wp_script_is( 'theme_typekit', 'done' ) ) { ?>
+  	<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+<?php }
+}
+add_action( 'wp_head', 'theme_typekit_inline' );*/
+
+
+//Plugins
+/* Woocommerce 
+add_action( 'after_setup_theme', 'woocommerce_support' );
+function woocommerce_support() {
+	add_theme_support( 'woocommerce' );
+}*/
+
+/* Slick Slider 
+add_action( 'wp_enqueue_scripts', 'rv_enqueue_slick', 0 );
+function rv_enqueue_slick() {	
+	wp_enqueue_style( 'slick-css', '//cdn.jsdelivr.net/jquery.slick/1.5.9/slick.css', '', '1.5.9' );
+	wp_enqueue_script( 'slick-js', '//cdn.jsdelivr.net/jquery.slick/1.5.9/slick.min.js', array('jquery'), '1.5.9' );
+	wp_enqueue_script( 'slick-init-js', trailingslashit( get_template_directory_uri() ) . 'library/js/slick-init.js', array('jquery'), 1.0 );
+}
+*/
+
+// Conditional Scripts
+/*
+if (is_page('page-name-here')) {
+	// Conditional script(s)
+	wp_register_script('scriptname', get_template_directory_uri() . '/js/scriptname.js', array('jquery'), '1.0.0'); 
+}*/
 
 /* DON'T DELETE THIS CLOSING TAG */ ?>
